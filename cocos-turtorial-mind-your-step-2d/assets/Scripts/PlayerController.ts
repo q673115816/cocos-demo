@@ -24,19 +24,18 @@ export class PlayerController extends Component {
         // input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this)
     }
 
-    update(deltaTime: number) {
-        if (!this._stateJump) return;
-        this._curJumpTime += deltaTime;
-        if (this._curJumpTime > this._jumpTime) {
-            this.node.setPosition(this._targetPos)
-            this._stateJump = false;
-            this.onOnceJumpEnd();
+    setInputActive(active: boolean) {
+        if (active) {
+            input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this)
         } else {
-            this.node.getPosition(this._curPos)
-            this._deltaPos.x = this._curJumpSpeed * deltaTime;
-            Vec3.add(this._curPos, this._curPos, this._deltaPos)
-            this.node.setPosition(this._curPos)
+            input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this)
         }
+    }
+
+    reset() {
+        this._curMoveIndex = 0;
+        this.node.getPosition(this._curPos)
+        this._targetPos.set(0, 0, 0);
     }
 
     onMouseUp(event: EventMouse) {
@@ -46,7 +45,7 @@ export class PlayerController extends Component {
             this.jumpByStep(2)
         }
     }
-
+    
     jumpByStep(step: number) {
         if (this._stateJump) return;
         this._stateJump = true;
@@ -75,22 +74,23 @@ export class PlayerController extends Component {
         this._curMoveIndex += step;
     }
 
-    setInputActive(active: boolean) {
-        if (active) {
-            input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this)
-        } else {
-            input.off(Input.EventType.MOUSE_UP, this.onMouseUp, this)
-        }
-    }
-
-    reset() {
-        this._curMoveIndex = 0;
-        this.node.getPosition(this._curPos)
-        this._targetPos.set(0, 0, 0);
-    }
-
     onOnceJumpEnd() {
         this.node.emit('JumpEnd', this._curMoveIndex)
+    }
+
+    update(deltaTime: number) {
+        if (!this._stateJump) return;
+        this._curJumpTime += deltaTime;
+        if (this._curJumpTime > this._jumpTime) {
+            this.node.setPosition(this._targetPos)
+            this._stateJump = false;
+            this.onOnceJumpEnd();
+        } else {
+            this.node.getPosition(this._curPos)
+            this._deltaPos.x = this._curJumpSpeed * deltaTime;
+            Vec3.add(this._curPos, this._curPos, this._deltaPos)
+            this.node.setPosition(this._curPos)
+        }
     }
 }
 

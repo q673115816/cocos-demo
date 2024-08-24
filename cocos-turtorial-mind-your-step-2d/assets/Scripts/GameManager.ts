@@ -34,11 +34,7 @@ export class GameManager extends Component {
         this.setCurState(GameState.GS_INIT)
         this.playerCtrl?.node.on('JumpEnd', this.onPlayerJumpEnd, this)
     }
-
-    update(deltaTime: number) {
-
-    }
-
+    
     init() {
         if (this.startMenu) {
             this.startMenu.active = true;
@@ -51,6 +47,23 @@ export class GameManager extends Component {
             this.playerCtrl.node.setPosition(Vec3.ZERO)
             this.playerCtrl.reset();
         }
+    }
+
+    setCurState(value: GameState) {
+        switch (value) {
+            case GameState.GS_INIT:
+                this.init()
+                break;
+            case GameState.GS_PLAYING:
+                this.playing();
+                break;
+            case GameState.GS_END:
+                break;
+        }
+    }
+
+    update(deltaTime: number) {
+
     }
 
     playing() {
@@ -67,21 +80,6 @@ export class GameManager extends Component {
                 this.playerCtrl.setInputActive(true)
             }
         }, 0.1)
-    }
-
-    spawnBlockByType(type: BlockType) {
-        if (!this.boxPrefab) return null
-
-        let block: Node | null = null;
-        switch (type) {
-            case BlockType.BT_STONE:
-                block = instantiate(this.boxPrefab)
-                break;
-
-            default:
-                break;
-        }
-        return block;
     }
 
     generateRoad() {
@@ -108,17 +106,19 @@ export class GameManager extends Component {
         }
     }
 
-    setCurState(value: GameState) {
-        switch (value) {
-            case GameState.GS_INIT:
-                this.init()
+    spawnBlockByType(type: BlockType) {
+        if (!this.boxPrefab) return null
+
+        let block: Node | null = null;
+        switch (type) {
+            case BlockType.BT_STONE:
+                block = instantiate(this.boxPrefab)
                 break;
-            case GameState.GS_PLAYING:
-                this.playing();
-                break;
-            case GameState.GS_END:
+
+            default:
                 break;
         }
+        return block;
     }
 
     onStartButtonClicked() {
